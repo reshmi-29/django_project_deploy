@@ -1,0 +1,74 @@
+{% extends "courses/base.html" %}
+
+{% block title %}Course List{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">📚 Course Management</h2>
+
+    <!-- Success and Error Messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {% if message.level_tag == 'error' %}alert-danger{% else %}alert-success{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Create Course Button -->
+    <div class="mb-3 text-end">
+        <a href="{% url 'course_create' %}" class="btn btn-success btn-lg shadow-sm">+ Create New Course</a>
+    </div>
+
+    {% if courses %}
+        <ul class="list-group">
+            {% for course in courses %}
+                <li class="list-group-item mb-4 shadow-sm p-3 rounded">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start">
+                        <!-- Course Info -->
+                        <div class="me-md-4 flex-grow-1">
+                            <h5 class="fw-bold">
+                                <a href="{% url 'course_detail' course.pk %}" class="text-decoration-none text-dark">
+                                    {{ course.title }}
+                                </a>
+                            </h5>
+                            <p class="mb-1 text-muted">{{ course.description|truncatewords:15 }}</p>
+                            <p><strong>Duration:</strong> {{ course.duration }} hrs</p>
+
+                            <!-- Action Buttons (One Line) -->
+                            <div class="btn-group mt-2" role="group">
+                                <a href="{% url 'course_update' course.id %}" class="btn btn-outline-warning btn-sm">✏️ Edit</a>
+                                <form action="{% url 'course_delete' course.id %}" method="post" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Are you sure?')">🗑 Delete</button>
+                                </form>
+                                <a href="{% url 'lesson_create' %}" class="btn btn-outline-info btn-sm">➕ Add Lesson</a>
+                                <a href="{% url 'course_detail' course.id %}" class="btn btn-outline-secondary btn-sm">📖 View Lessons</a>
+                                <a href="{% url 'view_students' course.id %}" class="btn btn-outline-primary btn-sm">👥 View Students</a>
+                            </div>
+                        </div>
+
+                        <!-- Thumbnail -->
+                        <div class="mt-3 mt-md-0">
+                            <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}" width="160" height="110" class="rounded border">
+                        </div>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-center text-muted">No courses available.</p>
+    {% endif %}
+</div>
+
+<!-- Optional Custom Hover Styles -->
+<style>
+    .btn:hover {
+        transform: scale(1.05);
+        transition: 0.2s ease-in-out;
+    }
+    .list-group-item:hover {
+        background-color: #f8f9fa;
+    }
+</style>
+{% endblock %}
